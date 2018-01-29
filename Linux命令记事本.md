@@ -213,3 +213,15 @@ linux在执行shell命令之前，就会确定好所有的输入输出位置，�
 |2>&1 >/dev/null	|丢弃|	屏幕|
 
 
+# history命令显示时间
+
+1、 临时显示
+
+输入 `export HISTTIMEFORMAT='%F %T'`
+
+2、 永久生效
+
+编辑 /root/.bashrc
+增加一行 `export HISTTIMEFORMAT='%F %T'`,并执行 `source ~/.bashrc`使之生效
+
+
