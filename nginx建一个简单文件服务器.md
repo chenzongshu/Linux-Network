@@ -1,3 +1,5 @@
+# 使用Nginx
+
 安装nginx
 
 修改/etc/nginx/nginx.conf配置，增加下面的配置即可，文件存放目录要存在
@@ -16,3 +18,15 @@ server {
         }
 }
 ```
+
+# 使用httpd
+
+安装httpd 并启动
+
+```
+yum install -y httpd
+```
+
+找到 `/var/www/html` , 建个下载文件夹`file`
+
+然后把文件放入`file`中， 然后就可以使用了
