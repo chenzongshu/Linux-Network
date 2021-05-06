@@ -224,4 +224,15 @@ linux在执行shell命令之前，就会确定好所有的输入输出位置，�
 编辑 /root/.bashrc
 增加一行 `export HISTTIMEFORMAT='%F %T'`,并执行 `source ~/.bashrc`使之生效
 
+# 生成指定大小的随机字符串文件
+
+```
+dd if=/dev/urandom of=randomfile bs=1M count=1
+```
+
+- `of=randomfile` 为生成的文件名
+- `bs`：缓存大小，用来做创建文件的大小单位，可以是1k，1M，1G，不要超过系统的缓存大小。
+- `count`：要创建的文件大小几个单位bs
+
+从中我们可以看出要创建的文件个数为一个，文件大小为：bs*count
 
