@@ -1,10 +1,8 @@
-
 https://www.cnblogs.com/metoy/p/4320813.html
 
 http://blog.csdn.net/u011456940/article/details/52634184
 
 http://blog.chinaunix.net/uid-26495963-id-3279216.html
-
 
 iptables 实际上就是一种包过滤型防火墙
 
@@ -41,9 +39,10 @@ iptables 实际上就是一种包过滤型防火墙
 
 ![](http://www.linuxidc.com/upload/2012_08/120807094039061.gif)
 
-> 	对于filter来讲一般只能做在3个链上：INPUT ，FORWARD ，OUTPUT
-对于nat来讲一般也只能做在3个链上：PREROUTING ，OUTPUT ，POSTROUTING
-而mangle则是5个链都可以做：PREROUTING，INPUT，FORWARD，OUTPUT，POSTROUTING
+>     对于filter来讲一般只能做在3个链上：INPUT ，FORWARD ，OUTPUT
+> 
+> 对于nat来讲一般也只能做在3个链上：PREROUTING ，OUTPUT ，POSTROUTING
+> 而mangle则是5个链都可以做：PREROUTING，INPUT，FORWARD，OUTPUT，POSTROUTING
 
 # 命令
 
@@ -98,7 +97,7 @@ service iptables save
 
 ```
 iptables -I INPUT -p icmp -j REJECT
-``` 
+```
 
 2.允许防火墙转发除ICMP协议以外的所有数据包
 
@@ -106,7 +105,7 @@ iptables -I INPUT -p icmp -j REJECT
 iptables -A FORWARD -p ! icmp -j ACCEPT
 说明：使用“！”可以将条件取反。
 ```
- 
+
 3.拒绝转发来自192.168.1.10主机的数据，允许转发来自192.168.0.0/24网段的数据
 
 ```
@@ -114,7 +113,7 @@ iptables -A FORWARD -s 192.168.1.11 -j REJECT
 iptables -A FORWARD -s 192.168.0.0/24 -j ACCEPT
 说明：注意要把拒绝的放在前面不然就不起作用了啊。
 ```
- 
+
 4.丢弃从外网接口（eth1）进入防火墙本机的源地址为私网地址的数据包
 
 ```
@@ -132,7 +131,6 @@ iptables -A INPUT -i eth1 -s 10.0.0.0/8 -j DROP
 说明：这个策略咱们借助crond计划任务来完成，就再好不过了。
 [1]   Stopped     at now 2 hours
 ```
- 
 
 6.只允许管理员从202.13.0.0/16网段使用SSH远程登录防火墙主机。
 
@@ -141,7 +139,6 @@ iptables -A INPUT -p tcp --dport 22 -s 202.13.0.0/16 -j ACCEPT
 iptables -A INPUT -p tcp --dport 22 -j DROP
 说明：这个用法比较适合对设备进行远程管理时使用，比如位于分公司中的SQL服务器需要被总公司的管理员管理时。
 ```
- 
 
 7.允许本机开放从TCP端口20-1024提供的应用服务。
 
@@ -171,28 +168,28 @@ iptables -I INPUT -p icmp --icmp-type destination-Unreachable -j ACCEPT
 iptables -A FORWARD -m mac --mac-source 00:0c:29:27:55:3F -j DROP
 说明：iptables中使用“-m 模块关键字”的形式调用显示匹配。咱们这里用“-m mac –mac-source”来表示数据包的源MAC地址。
 ```
- 
+
 11.允许防火墙本机对外开放TCP端口20、21、25、110以及被动模式FTP端口1250-1280
 
 ```
 iptables -A INPUT -p tcp -m multiport --dport 20,21,25,110,1250:1280 -j ACCEPT
 说明：这里用“-m multiport –dport”来指定目的端口及范围
 ```
- 
+
 12.禁止转发源IP地址为192.168.1.20-192.168.1.99的TCP数据包。
 
 ```
 iptables -A FORWARD -p tcp -m iprange --src-range 192.168.1.20-192.168.1.99 -j DROP
 说明：此处用“-m –iprange –src-range”指定IP范围。
 ```
- 
+
 13.禁止转发与正常TCP连接无关的非—syn请求数据包。
 
 ```
 iptables -A FORWARD -m state --state NEW -p tcp ! --syn -j DROP
 说明：“-m state”表示数据包的连接状态，“NEW”表示与任何连接无关的，新的嘛！
 ```
- 
+
 14.拒绝访问防火墙的新数据包，但允许响应连接或与已有连接相关的数据包
 
 ```
@@ -200,7 +197,7 @@ iptables -A INPUT -p tcp -m state --state NEW -j DROP
 iptables -A INPUT -p tcp -m state --state ESTABLISHED,RELATED -j ACCEPT
 说明：“ESTABLISHED”表示已经响应请求或者已经建立连接的数据包，“RELATED”表示与已建立的连接有相关性的，比如FTP数据连接等。
 ```
- 
+
 15.只开放本机的web服务（80）、FTP(20、21、20450-20480)，放行外部主机发住服务器其它端口的应答数据包，将其他入站数据包均予以丢弃处理。
 
 ```

@@ -1,4 +1,3 @@
-
 进程(process)是资源分配的最小单位，线程(thread)是处理机调度的最小单位,进程开销大,线程开销小;但是线程core掉会后会引起整个down掉.
 
 每个进程有唯一的PID标识进程。PID是一个从1到32768的正整数，其中1一般是特殊进程init，其它进程从2开始依次编号。当用完32768后，从2重新开始.
@@ -25,15 +24,15 @@ fork函数就是用来创建子进程的.它复制了父进程:
 #include "stdio.h"
 #include "sys/types.h"
 #include "unistd.h"
- 
+
 int main()
 {
     pid_t pid1;
     pid_t pid2;
- 
+
     pid1 = fork();    #第1步
     pid2 = fork();    #第2步
- 
+
     printf("pid1:%d, pid2:%d\n", pid1, pid2);
 }
 ```
@@ -47,13 +46,12 @@ c、因为P0在两次分裂中都为父进程，所以(1001,1002)为P0;
 d、第一次分裂中,P0为(1001,0),P0-1为(0,0);
 e、第二次分裂, P0为(1001,1002),P0-2作为P0子进程,继承1001,为(1001,0);
                P0-1作为父进程,分裂,自身变为(0,1003),子进程P0-1-1为(0,0);
-  
 
->1、总共有4个jinc进程
-2、另外3个输出结果为
-pid1:1001, pid2:0
-pid1:0, pid2:1003
-pid1:0, pid2:0
+> 1、总共有4个jinc进程
+> 2、另外3个输出结果为
+> pid1:1001, pid2:0
+> pid1:0, pid2:1003
+> pid1:0, pid2:0
 
 ## exit()函数
 
@@ -73,17 +71,17 @@ pid1:0, pid2:0
 
 ```
 #include <unistd.h>  
-  
+
 int execl(const char *path, const char *arg, ...);  
-  
+
 int execlp(const char *file, const char *arg, ...);  
-  
+
 int execle(const char *path, const char *arg, ..., char *const envp[]);  
-  
+
 int execv(const char *path, char *const argv[]);  
-  
+
 int execvp(const char *file, char *const argv[]);  
-  
+
 int execve(const char *path, char *const argv[], char *const envp[]);  
 ```
 
