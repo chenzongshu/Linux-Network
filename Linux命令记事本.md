@@ -313,8 +313,6 @@ Total        11    11
 cat /proc/vmstat |grep numa;sleep 30;cat /proc/vmstat |grep numa;
 ```
 
-
-
 # 性能分析
 
 ## sar
