@@ -223,6 +223,76 @@ KiB Swap:        0 total,        0 free,        0 used.  7607492 avail Mem
 
 2. 共享内存 SHR 并不一定是共享的，比方说，程序的代码段、非共享的动态链接库，也都算在 SHR 里。当然，SHR 也包括了进程间真正共享的内存。所以在计算多个进程的内存使用时，不要把所有进程的 SHR 直接相加得出结果。
 
+# /proc/{pid}/smaps
+
+`/proc/{pid}/smaps` 展示了一个进程里面的内存消耗， 分为每个VMA（虚拟内存区域）
+
+```bash
+00601000-00602000 rw-p 00001000 fd:20 83894544  /jdk1.8.0_202/bin/java
+Size:                  4 kB
+KernelPageSize:        4 kB
+MMUPageSize:           4 kB
+Rss:                   4 kB
+Pss:                   4 kB
+Shared_Clean:          0 kB
+Shared_Dirty:          0 kB
+Private_Clean:         0 kB
+Private_Dirty:         4 kB
+Referenced:            4 kB
+Anonymous:             4 kB
+LazyFree:              0 kB
+AnonHugePages:         0 kB
+ShmemPmdMapped:        0 kB
+Shared_Hugetlb:        0 kB
+Private_Hugetlb:       0 kB
+Swap:                  0 kB
+SwapPss:               0 kB
+Locked:                0 kB
+THPeligible:    0
+ProtectionKey:         0
+VmFlags: rd wr mr mw me dw ac sd 
+```
+
+- size： 虚拟内存总空间大小
+
+- Rss：**是实际分配的内存**，这部分物理内存已经分配，不需要缺页中断就可以使用的
+
+- Pss：**是平摊计算后的实际物理使用内存**(有些内存会和其他进程共享，例如mmap进来的)。实际上包含下面private_clean+private_dirty，和按比例均分的shared_clean、shared_dirty
+
+
+
+# pmap
+
+```bash
+pmap [-x/-d] {pid}
+
+
+Address           Kbytes Mode  Offset           Device    Mapping
+0000000000400000       4 r-x-- 0000000000000000 0fd:00020 java
+0000000000600000       4 r---- 0000000000000000 0fd:00020 java
+0000000000601000       4 rw--- 0000000000001000 0fd:00020 java
+00000000011cf000     132 rw--- 0000000000000000 000:00000   [ anon ]
+00000004e0800000 12614528 rw--- 0000000000000000 000:00000   [ anon ]
+```
+
+
+
+- Address:  start address of map  映像起始地址  
+
+- Kbytes:  size of map in kilobytes  映像大小  
+
+- RSS:  resident set size in kilobytes  驻留集大小  
+
+- Dirty:  dirty pages (both shared and private) in kilobytes  脏页大小  
+
+- Mode:  permissions on map 映像权限: r=read, w=write, x=execute, s=shared, p=private (copy on write)    
+
+- Mapping:  file backing the map , or '[ anon ]' for allocated memory, or '[ stack ]' for the program stack.  映像支持文件,[anon]为已分配内存 [stack]为程序堆栈  
+
+- Offset:  offset into the file  文件偏移  
+
+- Device:  device name (major:minor)  设备名
+
 # 内存Buffer和Cache
 
 Buffer 和 Cache 的设计目的，是为了提升系统的 I/O 性能。它们利用内存，充当起慢速磁盘与快速 CPU 之间的桥梁，可以加速 I/O 的访问速度。

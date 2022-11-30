@@ -357,3 +357,19 @@ cat /proc/vmstat |grep numa;sleep 30;cat /proc/vmstat |grep numa;
 - DATA： 数据段
 
 可以根据这些数据来判断内存泄漏情况，比如如果 RES 太高而 SHR 不高，那可能是堆内存泄漏；如果 SHR 很高，那可能是 tmpfs/shm 之类的数据在持续增长，如果 VIRT 很高而 RES 很小，那可能是进程不停地在申请内存，但是却没有对这些内存进行任何的读写操作，即虚拟地址空间存在内存泄漏
+
+
+
+# 正则表达式
+
+## 选择含有特定字符串的行
+
+```
+^.*(string1|string2|string3).*\n
+```
+
+## 选定空白行
+
+```bash
+^\s*(?=\r?$)\n
+```
