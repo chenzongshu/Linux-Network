@@ -12,8 +12,6 @@ CPU 通过时分复用来处理很多任务，这其中包括一些硬件任务�
 
 管理中断的设备：Advanced Programmable Interrupt Controller（APIC）
 
-
-
 # 2 硬中断
 
 ## 2.1 中断处理流程

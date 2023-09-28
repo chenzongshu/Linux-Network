@@ -117,7 +117,9 @@ khugepaged主要参数配置：
 结合对应的参数：
 
 ```YAML
-- 如果透明大页THP的碎片整理开关设置为always，内存紧张时会和普通4 KB页一样，出现内存的直接回收或内存的直接整理，这两个操作均是同步等待的操作，会造成系统性能下降。- 如果khugepaged碎片整理的开关设置为1，在khugepaged内核守护进程进行内存合并操作时，会在内存路径中加锁。如果khugepaged碎片整理在错误的时间被触发，会对内存敏感型应用造成性能影响。- 如果保持开启透明大页THP，同时关闭上述两个碎片整理的开关，则内存分配过程相较于4 KB页可能会更快地消耗完空闲页资源，然后系统开始进入内存回收和内存整理的过程，反而更早的出现系统性能下降。
+- 如果透明大页THP的碎片整理开关设置为always，内存紧张时会和普通4 KB页一样，出现内存的直接回收或内存的直接整理，这两个操作均是同步等待的操作，会造成系统性能下降。
+- 如果khugepaged碎片整理的开关设置为1，在khugepaged内核守护进程进行内存合并操作时，会在内存路径中加锁。如果khugepaged碎片整理在错误的时间被触发，会对内存敏感型应用造成性能影响。
+- 如果保持开启透明大页THP，同时关闭上述两个碎片整理的开关，则内存分配过程相较于4 KB页可能会更快地消耗完空闲页资源，然后系统开始进入内存回收和内存整理的过程，反而更早的出现系统性能下降。
 ```
 
 ## 透明大页内存查看和监控
@@ -168,26 +170,24 @@ AnonHugePages:         0 kBAnonHugePages:         0 kBAnonHugePages:         0 k
 - 运行 `cat /proc/buddyinfo, cat /proc/pagetypeinfo`查看内存碎片情况， 指标含义参考 （ [https://man7.org/linux/man-pages/man5/proc.5.html](https://man7.org/linux/man-pages/man5/proc.5.html) ），同样关注 order >= 3 的剩余页面数量，
 4. 在**/proc/vmstat**中有许多计数器可以用于监视系统提供大页面
 - **thp_fault_alloc** : 每当处理缺页异常时，一个大页面被成功分配，thp_fault_alloc就会增加。这适用于第一次出现缺页异常和COW错误。
-
 - **thp_collapse_alloc**：当它发现一个范围的页面坍缩成一个大页，并有成功分配一个新的巨大页来存储数据，thp_collapse_alloc会被khugepaged增加。
-
 - **thp_fault_fallback**: 如果缺页异常失败的分配一个大页，则thp_fault_fallback被增加，而回退使用小页面。
-
 - **thp_collapse_alloc_failed**: 当它发现一个范围的页面应该被坍缩成一个大页， 但是分配大页失败，thp_collapse_alloc_failed会被khugepaged增加。
-
 - **thp_file_alloc**: 在文件大页成功分配时递增。
-
 - **thp_file_mapped**: 每映射到一个文件大页到用户地址空间，thp_file_mapped就增加一次。
-
 - **thp_split_page**：在每次将一个巨大的页面分裂为普通页时递增。发生这种情况的原因有很多，但都很常见原因是一个巨大的页面是旧的，正在被回收。这个操作意味着分裂页面映射的所有PMD。
-
 - **thp_split_page_failed**：如果内核无法分裂大页，则增加thp_split_page_failed计数。如果页面被人pin住了，就会发生这种情况。
-
 - **thp_deferred_split_page**：当大页被放到分裂队列时，thp_deferred_split_page计数被增加。当一个巨大的页面部分被unmap且分裂它将释放一些内存就会发生这种情况。分裂队列上的页将在内存压力下分裂。
-
 - **thp_split_pmd**: 每当pmd分裂成pte表时，thp_split_pmd就会递增。例如，当应用程序调用mprotect()或unmap()在大页面的一部分。它不会分割大页面，只是页表条目。
-
 - **thp_zero_page_alloc**: thp_zero_page_alloc在每出现一个巨型零页被成功地分配时递增。它包括分配，放弃了与其他分配的竞争。注意，这不算每次巨型零页的映射，只有它的分配。
+
+### 查看所有使用透明大页的进程
+
+```bash
+grep -e AnonHugePages  /proc/*/smaps | awk  '{ if($2>4) print $0} ' |  awk -F "/"  '{print $0; system("ps -fp " $3)} '
+```
+
+
 
 # page cache
 
